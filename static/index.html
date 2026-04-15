@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perific – Timrapport</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --emerald: #47D7AC;
+    --midnight: #1C1D2A;
+    --midnight2: #252637;
+    --midnight3: #2f3047;
+    --white: #F4F5F0;
+    --muted: #8889a0;
+    --danger: #ff6b6b;
+    --border: rgba(71,215,172,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--midnight); color: var(--white); font-family: 'IBM Plex Sans', sans-serif; min-height: 100vh; padding: 24px 20px 60px; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(71,215,172,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(71,215,172,0.04) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Header */
+  header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .logo-mark { width: 40px; height: 40px; background: var(--emerald); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: var(--midnight); letter-spacing: -1px; flex-shrink: 0; }
+  .header-text h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.02em; }
+  .header-text p { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+  .hamburger { margin-left: auto; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--muted); font-size: 18px; transition: all 0.2s; }
+  .hamburger:hover { color: var(--emerald); border-color: var(--emerald); }
+
+  /* Menu overlay */
+  .menu-overlay { position: fixed; inset: 0; background: var(--midnight); z-index: 100; display: none; overflow-y: auto; }
+  .menu-overlay.open { display: block; }
+  .menu-header { display: flex; align-items: center; gap: 16px; padding: 24px 20px 20px; border-bottom: 1px solid var(--border); max-width: 960px; margin: 0 auto; }
+  .menu-header h2 { font-size: 14px; font-weight: 600; letter-spacing: 0.02em; }
+  .back-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; cursor: pointer; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px; transition: all 0.2s; white-space: nowrap; }
+  .back-btn:hover { color: var(--emerald); border-color: var(--emerald); }
+  .menu-nav { display: flex; gap: 8px; padding: 16px 20px; max-width: 960px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+  .menu-tab { background: var(--midnight2); border: 1px solid var(--border); color: var(--muted); padding: 8px 18px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; transition: all 0.2s; }
+  .menu-tab:hover { color: var(--white); }
+  .menu-tab.active { background: rgba(71,215,172,0.08); color: var(--emerald); border-color: rgba(71,215,172,0.3); }
+  .menu-content { max-width: 960px; margin: 0 auto; padding: 20px; }
+  .menu-view { display: none; }
+  .menu-view.active { display: block; }
+
+  /* Card */
+  .card { background: var(--midnight2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card-title { font-size: 11px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--emerald); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Form */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  input, select { background: var(--midnight3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px 14px; color: var(--white); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; appearance: none; -webkit-appearance: none; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2347D7AC' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-color: var(--midnight3); padding-right: 36px; }
+  select option, select optgroup { background: var(--midnight2); color: var(--white); }
+  input:focus, select:focus { border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(71,215,172,0.08); }
+  input::placeholder { color: var(--muted); }
+  input:read-only { opacity: 0.6; cursor: not-allowed; }
+  .error-msg { font-size: 11px; color: var(--danger); font-family: 'IBM Plex Mono', monospace; margin-top: 4px; display: none; }
+  .field.has-error input, .field.has-error select { border-color: var(--danger); }
+  .field.has-error .error-msg { display: block; }
+
+  /* Buttons */
+  .btn-primary { width: 100%; background: var(--emerald); color: var(--midnight); border: none; border-radius: 8px; padding: 14px 24px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 0.02em; transition: opacity 0.2s, transform 0.1s; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-export { background: transparent; border: 1px solid var(--border); color: var(--emerald); border-radius: 6px; padding: 6px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s; }
+  .btn-export:hover { background: rgba(71,215,172,0.08); }
+  .btn-add-row { flex: 1; background: var(--emerald); color: var(--midnight); border: none; border-radius: 8px; padding: 10px 20px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+  .btn-add-row:hover { opacity: 0.9; }
+  .btn-add-row:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Total bar */
+  .total-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(71,215,172,0.06); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-top: 8px; }
+  .total-bar span { font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--muted); }
+  .total-value { font-size: 16px; font-weight: 600; color: var(--emerald); }
+  .total-value.warn { color: var(--danger); }
+
+  /* Rows list */
+  .row-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--midnight3); border-radius: 6px; margin-bottom: 6px; }
+  .row-item .row-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .row-item button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 0 4px; line-height: 1; }
+  .row-item button:hover { color: var(--danger); }
+
+  /* Badge */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.05em; background: rgba(71,215,172,0.12); color: var(--emerald); }
+
+  /* Confirmation */
+  .confirmation { text-align: center; padding: 24px 0 8px; }
+  .confirmation .check { font-size: 40px; margin-bottom: 12px; }
+  .confirmation h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .confirmation p { color: var(--muted); font-size: 13px; font-family: 'IBM Plex Mono', monospace; }
+  .submitted-rows { margin-top: 20px; text-align: left; }
+
+  /* Drawer content views */
+  .drawer-view { padding: 16px; display: none; }
+  .drawer-view.active { display: block; }
+
+  /* Pivot table */
+  .pivot-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:not(:first-child) { text-align: center; }
+  thead th:first-child { position: sticky; left: 0; background: var(--midnight2); z-index: 2; min-width: 110px; }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+  tbody tr:hover { background: rgba(71,215,172,0.03); }
+  tbody td { padding: 7px 10px; vertical-align: middle; font-size: 12px; }
+  tbody td:first-child { position: sticky; left: 0; background: var(--midnight2); z-index: 1; font-size: 12px; white-space: nowrap; }
+  tbody tr:hover td:first-child { background: var(--midnight3); }
+  tbody td:not(:first-child) { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .team-row td { background: rgba(71,215,172,0.06) !important; font-weight: 600; color: var(--emerald); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .heat-0 { color: rgba(136,137,160,0.25); }
+  .heat-1 { color: #8889a0; }
+  .heat-2 { color: #6bbf9a; }
+  .heat-3 { color: var(--emerald); }
+  .heat-4 { color: var(--emerald); font-weight: 600; }
+  .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--emerald); color: var(--midnight); padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 13px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 200; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); color: var(--white); }
+
+  @media (max-width: 520px) {
+    .form-row { grid-template-columns: 1fr; }
+    .card { padding: 20px; }
+    .drawer { width: 100%; right: -100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo-mark">P</div>
+    <div class="header-text">
+      <h1>Perific – Timrapport</h1>
+      <p>Veckovis tidsrapportering / Developer time log</p>
+    </div>
+    <button class="hamburger" onclick="openDrawer()" title="Meny">☰</button>
+  </header>
+
+  <!-- ── Report form ──────────────────────────────────────────────────────── -->
+  <div id="form-view">
+    <div class="card">
+      <div class="card-title">Rapportera tid</div>
+
+      <div class="form-row">
+        <div class="field" id="field-name">
+          <label>Namn</label>
+          <input type="text" id="inp-name" placeholder="Ditt namn" autocomplete="off" list="reporters-list">
+          <datalist id="reporters-list"></datalist>
+          <span class="error-msg">Ange ditt namn</span>
+        </div>
+        <div class="field" id="field-week">
+          <label>Vecka</label>
+          <input type="week" id="inp-week" style="color-scheme:dark">
+          <span class="error-msg">Välj en vecka</span>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:8px">Lägg till rad</div>
+
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="field" id="field-project">
+          <label>Projekt</label>
+          <select id="inp-project" onchange="onProjectChange()">
+            <option value="" disabled selected>Välj projekt…</option>
+            <optgroup label="Software">
+              <option>Shield</option>
+              <option>App</option>
+              <option>Admin / Webb</option>
+              <option>Flow / Värme 2.0</option>
+            </optgroup>
+            <optgroup label="Hardware">
+              <option>Floor</option>
+              <option>Thor Charger</option>
+              <option>Flow Gateway</option>
+            </optgroup>
+            <optgroup label="Övrigt">
+              <option>Möte</option>
+              <option>Intern</option>
+              <option>Infra / Backend</option>
+            </optgroup>
+            <optgroup label="Frånvaro">
+              <option>Ledigt</option>
+              <option>Sjuk</option>
+              <option>VAB</option>
+            </optgroup>
+          </select>
+          <span class="error-msg">Välj ett projekt</span>
+        </div>
+        <div class="field" id="field-category">
+          <label>Kategori</label>
+          <select id="inp-category">
+            <option value="" disabled selected>Välj kategori…</option>
+            <option class="cat-normal">Nyutveckling</option>
+            <option class="cat-normal">Support / Maint.</option>
+            <option class="cat-normal">Möten / Övrigt</option>
+            <option class="cat-absence" style="display:none">Ledighet</option>
+          </select>
+          <span class="error-msg">Välj en kategori</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:16px">
+        <div class="field" style="flex:1" id="field-pct">
+          <label>Andel</label>
+          <div style="position:relative">
+            <input type="number" id="inp-pct" min="5" max="100" step="5" placeholder="0" style="padding-right:28px" oninput="clampPct()">
+            <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-family:'IBM Plex Mono',monospace;pointer-events:none">%</span>
+          </div>
+          <span class="error-msg">Ange andel</span>
+        </div>
+        <button class="btn-add-row" id="btn-add" onclick="addRow()">+ Lägg till</button>
+      </div>
+
+      <!-- Running rows -->
+      <div id="rows-list" style="display:none;margin-bottom:16px">
+        <div id="rows-items"></div>
+      </div>
+
+      <div class="total-bar">
+        <span>Totalt fördelat</span>
+        <span class="total-value" id="total-display">0%</span>
+      </div>
+      <div style="margin-top:8px;height:4px;background:var(--midnight3);border-radius:2px;overflow:hidden">
+        <div id="progress-bar" style="height:100%;width:0%;background:var(--emerald);border-radius:2px;transition:width 0.3s ease"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn-primary" id="btn-submit" onclick="submitEntry()" style="display:none">✓ Spara rapport</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Confirmation view ────────────────────────────────────────────────── -->
+  <div id="confirm-view" style="display:none">
+    <div class="card">
+      <div class="confirmation">
+        <div class="check">✅</div>
+        <h2>Rapport sparad!</h2>
+        <p id="confirm-week-label"></p>
+      </div>
+      <div class="submitted-rows">
+        <div class="card-title" style="margin-top:24px">Din rapport</div>
+        <div id="confirm-rows"></div>
+      </div>
+      <div style="margin-top:24px">
+        <button class="btn-primary" style="background:var(--midnight3);color:var(--emerald);border:1px solid var(--border)" onclick="newReport()">+ Ny rapport</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Menu overlay ─────────────────────────────────────────────────────── -->
+<div class="menu-overlay" id="menu-overlay">
+  <div class="menu-header">
+    <button class="back-btn" onclick="closeMenu()">← Tillbaka</button>
+    <h2>Perific – Översikt</h2>
+  </div>
+  <div class="menu-nav">
+    <button class="menu-tab active" id="mtab-pivot" onclick="showMenuView('pivot')">📊 Veckoöversikt</button>
+    <button class="menu-tab" id="mtab-detail" onclick="showMenuView('detail')">📋 Detaljvy</button>
+  </div>
+  <div class="menu-content">
+
+    <!-- Pivot -->
+    <div class="menu-view active" id="mview-pivot">
+      <div class="card" style="padding:16px 20px;margin-bottom:16px">
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+          <div class="field" style="margin:0;flex:1;min-width:140px">
+            <label>Från vecka</label>
+            <input type="week" id="pivot-from" style="color-scheme:dark">
+          </div>
+          <div class="field" style="margin:0;flex:1;min-width:140px">
+            <label>Till vecka</label>
+            <input type="week" id="pivot-to" style="color-scheme:dark">
+          </div>
+          <button class="btn-export" onclick="renderPivot()" style="margin-bottom:1px;padding:10px 20px">Visa →</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow-x:auto">
+        <table id="pivot-table">
+          <tbody><tr><td class="empty-state" colspan="20">Välj period och klicka Visa →</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Detail -->
+    <div class="menu-view" id="mview-detail">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn-export" onclick="exportCSV()">↓ Exportera CSV</button>
+      </div>
+      <div class="card" style="padding:0;overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>Namn</th><th>Vecka</th><th>Projekt</th><th>Kategori</th><th style="text-align:right">Andel</th></tr>
+          </thead>
+          <tbody id="log-body">
+            <tr><td colspan="5" class="empty-state">Laddar…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let entries = [];
+  let slackId = null;
+  let reporters = {};
+  let rows = [];
+
+  const ABSENCE = ['Ledigt', 'Sjuk', 'VAB'];
+  const MEETING_PROJECTS = ['Möte'];
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  async function init() {
+    document.getElementById('inp-week').value = toISOWeek(new Date());
+
+    try {
+      const res = await fetch('/api/reporters');
+      reporters = await res.json();
+      const dl = document.getElementById('reporters-list');
+      Object.values(reporters).forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name; dl.appendChild(opt);
+      });
+    } catch(e) {}
+
+    const params = new URLSearchParams(location.search);
+    const uid = params.get('uid');
+    if (uid && reporters[uid]) {
+      slackId = uid;
+      const el = document.getElementById('inp-name');
+      el.value = reporters[uid];
+      el.readOnly = true;
+      const weekParam = params.get('week');
+      if (weekParam) document.getElementById('inp-week').value = weekParam;
+    }
+
+    initPivotDates();
+    await loadEntries();
+  }
+
+  function toISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const day = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - day);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
+  }
+
+  // ── Menu overlay ─────────────────────────────────────────────────────────
+  function openDrawer() {
+    document.getElementById('menu-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    document.getElementById('menu-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function showMenuView(view) {
+    ['pivot','detail'].forEach(v => {
+      document.getElementById(`mview-${v}`).classList.toggle('active', v === view);
+      document.getElementById(`mtab-${v}`).classList.toggle('active', v === view);
+    });
+    if (view === 'pivot') renderPivot();
+  }
+
+  // ── Form logic ────────────────────────────────────────────────────────────
+  function onProjectChange() {
+    const project  = document.getElementById('inp-project').value;
+    const catSel   = document.getElementById('inp-category');
+    const pctInput = document.getElementById('inp-pct');
+    const absOpt   = catSel.querySelector('.cat-absence');
+    const normOpts = catSel.querySelectorAll('.cat-normal');
+
+    if (ABSENCE.includes(project)) {
+      // Show only Ledighet, hide normal categories
+      normOpts.forEach(o => { o.style.display = 'none'; });
+      absOpt.style.display = '';
+      catSel.value = 'Ledighet';
+      catSel.disabled = true;
+      pctInput.value = 100 - totalPct();
+    } else {
+      // Show normal categories, hide Ledighet
+      normOpts.forEach(o => { o.style.display = ''; });
+      absOpt.style.display = 'none';
+      if (catSel.value === 'Ledighet') catSel.value = '';
+      catSel.disabled = false;
+      if (MEETING_PROJECTS.includes(project)) catSel.value = 'Möten / Övrigt';
+    }
+  }
+
+  function clampPct() {
+    const input = document.getElementById('inp-pct');
+    const max = 100 - totalPct();
+    if (parseFloat(input.value) > max) input.value = max;
+  }
+
+  function totalPct() { return rows.reduce((s, r) => s + r.pct, 0); }
+
+  function setError(fieldId, show) {
+    document.getElementById('field-' + fieldId).classList.toggle('has-error', show);
+  }
+
+  function addRow() {
+    const project  = document.getElementById('inp-project').value;
+    const category = document.getElementById('inp-category').value;
+    const pct      = parseFloat(document.getElementById('inp-pct').value) || 0;
+
+    let valid = true;
+    setError('project',  !project);  if (!project)  valid = false;
+    setError('category', !category); if (!category) valid = false;
+    setError('pct', pct <= 0);       if (pct <= 0)  valid = false;
+    if (!valid) return;
+
+    const remaining = 100 - totalPct();
+    if (pct > remaining) { showToast(`Max ${remaining}% kvar.`, true); return; }
+
+    rows.push({ project, category, pct });
+    renderRows();
+    updateTotal();
+
+    document.getElementById('inp-project').value = '';
+    document.getElementById('inp-category').value = '';
+    document.getElementById('inp-category').disabled = false;
+    document.getElementById('inp-pct').value = '';
+    ['project','category','pct'].forEach(f => setError(f, false));
+  }
+
+  function removeRow(i) { rows.splice(i, 1); renderRows(); updateTotal(); }
+
+  function renderRows() {
+    const container = document.getElementById('rows-list');
+    const items     = document.getElementById('rows-items');
+    if (!rows.length) { container.style.display = 'none'; return; }
+    container.style.display = 'block';
+    items.innerHTML = rows.map((r, i) => `
+      <div class="row-item">
+        <div class="row-info">
+          <span class="badge">${r.project}</span>
+          <span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace">${r.category}</span>
+          <span style="color:var(--emerald);font-family:'IBM Plex Mono',monospace;font-weight:600">${r.pct}%</span>
+        </div>
+        <button onclick="removeRow(${i})" title="Ta bort">×</button>
+      </div>
+    `).join('');
+  }
+
+  function updateTotal() {
+    const total = totalPct();
+    const el = document.getElementById('total-display');
+    el.textContent = total + '%';
+    el.className = 'total-value' + (total > 100 ? ' warn' : '');
+    // Progress bar
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = Math.min(total, 100) + '%';
+    bar.style.background = total > 100 ? 'var(--danger)' : total === 100 ? 'var(--emerald)' : 'rgba(71,215,172,0.6)';
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnAdd    = document.getElementById('btn-add');
+    btnSubmit.style.display = total >= 100 ? 'block' : 'none';
+    btnAdd.disabled = total >= 100;
+    btnAdd.style.opacity = total >= 100 ? '0.4' : '1';
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  async function submitEntry() {
+    const name = document.getElementById('inp-name').value.trim();
+    const week = document.getElementById('inp-week').value;
+    let valid = true;
+    setError('name', !name); if (!name) valid = false;
+    setError('week', !week); if (!week) valid = false;
+    if (!valid) return;
+    if (!rows.length) { showToast('Lägg till minst en rad.', true); return; }
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true; btn.textContent = 'Sparar…';
+
+    try {
+      for (const row of rows) {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slack_id: slackId || '', name, week, project: row.project, category: row.category, pct: row.pct, dev: 0, support: 0, admin: 0, absence: 0 }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+      }
+      showConfirmation(name, week, [...rows]);
+      rows = []; renderRows(); updateTotal();
+      await loadEntries();
+    } catch(e) {
+      showToast('Något gick fel — försök igen.', true);
+    } finally {
+      btn.disabled = false; btn.textContent = '✓ Spara rapport';
+    }
+  }
+
+  function showConfirmation(name, week, submittedRows) {
+    document.getElementById('form-view').style.display = 'none';
+    document.getElementById('confirm-view').style.display = 'block';
+    document.getElementById('confirm-week-label').textContent = `${name} · ${formatWeek(week)}`;
+    document.getElementById('confirm-rows').innerHTML = submittedRows.map(r => `
+      <div class="row-item" style="margin-bottom:6px">
+        <div class="row-info">
+          <span class="badge">${r.project}</span>
+          <span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace">${r.category}</span>
+          <span style="color:var(--emerald);font-family:'IBM Plex Mono',monospace;font-weight:600">${r.pct}%</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function newReport() {
+    document.getElementById('confirm-view').style.display = 'none';
+    document.getElementById('form-view').style.display = 'block';
+    if (!document.getElementById('inp-name').readOnly)
+      document.getElementById('inp-name').value = '';
+  }
+
+  // ── Data ──────────────────────────────────────────────────────────────────
+  async function loadEntries() {
+    try {
+      const res = await fetch('/api/entries');
+      entries = await res.json();
+      renderLog();
+    } catch(e) {}
+  }
+
+  function formatWeek(w) {
+    if (!w) return '';
+    const [year, wk] = w.split('-W');
+    return `v${wk} ${year}`;
+  }
+
+  function renderLog() {
+    const tbody = document.getElementById('log-body');
+    if (!entries.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">— Inga poster ännu —</td></tr>';
+      return;
+    }
+    tbody.innerHTML = entries.map(e => `
+      <tr>
+        <td>${e.name}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">${formatWeek(e.week)}</td>
+        <td><span class="badge">${e.project}</span></td>
+        <td style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace">${e.category || '—'}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--emerald);text-align:right">${e.pct || e.total}%</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── Pivot ─────────────────────────────────────────────────────────────────
+  function initPivotDates() {
+    const now  = new Date();
+    const from = new Date(now); from.setDate(from.getDate() - 56);
+    document.getElementById('pivot-from').value = toISOWeek(from);
+    document.getElementById('pivot-to').value   = toISOWeek(now);
+  }
+
+  function renderPivot() {
+    const from = document.getElementById('pivot-from').value;
+    const to   = document.getElementById('pivot-to').value;
+    if (!from || !to) { showToast('Välj period', true); return; }
+
+    const filtered = entries.filter(e => e.week >= from && e.week <= to);
+    const tbody = document.querySelector('#pivot-table');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tbody><tr><td class="empty-state" colspan="20">Inga poster i vald period</td></tr></tbody>';
+      return;
+    }
+
+    const projects = [...new Set(filtered.map(e => e.project))].sort();
+    const names    = [...new Set(filtered.map(e => e.name))].sort();
+    const personWeeks = {};
+    names.forEach(n => { personWeeks[n] = new Set(filtered.filter(e => e.name === n).map(e => e.week)).size; });
+
+    const agg = {}; names.forEach(n => { agg[n] = {}; });
+    filtered.forEach(e => { agg[e.name][e.project] = (agg[e.name][e.project] || 0) + parseFloat(e.pct || 0); });
+    names.forEach(n => { projects.forEach(p => { if (agg[n][p]) agg[n][p] = Math.round(agg[n][p] / personWeeks[n]); }); });
+
+    const teamAgg = {};
+    projects.forEach(p => { teamAgg[p] = Math.round(names.reduce((s, n) => s + (agg[n][p] || 0), 0) / names.length); });
+
+    function heat(v) {
+      if (!v)    return 'heat-0';
+      if (v < 20) return 'heat-1';
+      if (v < 40) return 'heat-2';
+      if (v < 60) return 'heat-3';
+      return 'heat-4';
+    }
+
+    const allWeeks = new Set(filtered.map(e => e.week)).size;
+    let html = `<thead><tr>
+      <th>Snitt/vecka · ${formatWeek(from)}–${formatWeek(to)} (${allWeeks}v)</th>
+      ${projects.map(p => `<th>${p}</th>`).join('')}
+    </tr></thead><tbody>`;
+
+    names.forEach(n => {
+      html += `<tr><td>${n}</td>${projects.map(p => { const v = agg[n][p]||0; return `<td class="${heat(v)}">${v?v+'%':'—'}</td>`; }).join('')}</tr>`;
+    });
+    html += `<tr class="team-row"><td>TEAM SNITT</td>${projects.map(p => { const v=teamAgg[p]||0; return `<td>${v?v+'%':'—'}</td>`; }).join('')}</tr>`;
+    html += '</tbody>';
+    tbody.innerHTML = html;
+  }
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  function exportCSV() {
+    if (!entries.length) { alert('Inga poster att exportera.'); return; }
+    const header = ['Namn','Vecka','Projekt','Kategori','Andel (%)'];
+    const rows_data = entries.map(e => [e.name, formatWeek(e.week), e.project, e.category||'', e.pct||e.total]);
+    const csv = [header,...rows_data].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url;
+    a.download=`perific-timrapport-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function showToast(msg, isError=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError?' error':'');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2500);
+  }
+
+  init();
+</script>
+</body>
+</html>
