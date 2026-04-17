@@ -15,7 +15,7 @@ from config import REPORTERS, APP_URL
 
 START_WEEK = os.environ.get("START_WEEK", "2026-W16")
 
-scheduler = AsyncIOScheduler()
+scheduler = AsyncIOScheduler(timezone="Europe/Stockholm")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -69,6 +69,12 @@ def reporters():
 @app.get("/api/test-dm/{slack_id}")
 async def test_dm(slack_id: str):
     await send_dm(slack_id, "Hej! 👋 Detta är ett test av Perific Timrapport-boten. Om du ser detta funkar Slack-kopplingen! ✅")
+    return {"ok": True}
+
+
+@app.get("/api/trigger-morning")
+async def trigger_morning():
+    await remind_friday_morning()
     return {"ok": True}
 
 

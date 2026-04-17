@@ -25,5 +25,6 @@ else:
         {"name": "Dennis L",     "slack_id": "U0450PC2Y9H"},
         {"name": "Simon G",    "slack_id": "U03G4KL4K8X"},
         {"name": "Oskar Ö",    "slack_id": "U02R46W57PA"},
+        {"name": "Erik Å",    "slack_id": "U03G4KL9QDD"},
         # Lägg till övriga 5 här ...
     ]
