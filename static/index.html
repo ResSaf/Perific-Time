@@ -179,7 +179,7 @@
   <header>
     <div class="logo-mark">P</div>
     <div class="header-text">
-      <h1>Perific – Timrapport <button class="version-btn" onclick="openChangelog()" title="Versionshistorik">v1.4.0</button></h1>
+      <h1>Perific – Timrapport <button class="version-btn" onclick="openChangelog()" title="Versionshistorik">v1.6.0</button></h1>
       <p>Veckovis tidsrapportering / Developer time log</p>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px">
@@ -223,7 +223,7 @@
             <optgroup label="Hardware">
               <option>Floor</option>
               <option>Thor Charger</option>
-              <option>Flow Gateway</option>
+              <option>Flow / Gateway</option>
             </optgroup>
             <optgroup label="Övrigt">
               <option>Möte</option>
@@ -243,7 +243,8 @@
           <select id="inp-category">
             <option value="" disabled selected>Välj kategori…</option>
             <option class="cat-normal">Nyutveckling</option>
-            <option class="cat-normal">Support / Maint.</option>
+            <option class="cat-normal">Support</option>
+            <option class="cat-normal">Maintenance</option>
             <option class="cat-normal">Möten / Övrigt</option>
             <option class="cat-absence" style="display:none">Ledighet</option>
           </select>
@@ -308,9 +309,22 @@
 
     <div class="cl-version">
       <div class="cl-version-header">
-        <span class="cl-version-num current">v1.4.0</span>
+        <span class="cl-version-num current">v1.6.0</span>
         <span class="cl-version-date current">2026-04-17</span>
         <span class="cl-current-badge">CURRENT</span>
+      </div>
+      <ul class="cl-items">
+        <li>Support Duty tillagt som projektalternativ under Övrigt</li>
+        <li>Support / Maint. delad i två separata kategorier: Support och Maintenance</li>
+        <li>Flow Gateway omdöpt till Flow / Gateway</li>
+      </ul>
+    </div>
+    <hr class="cl-divider">
+
+    <div class="cl-version">
+      <div class="cl-version-header">
+        <span class="cl-version-num">v1.4.0</span>
+        <span class="cl-version-date">2026-04-17</span>
       </div>
       <ul class="cl-items">
         <li>Hjälpknapp (?) med lathund för ifyllning</li>
