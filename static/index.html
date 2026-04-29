@@ -179,7 +179,7 @@
   <header>
     <div class="logo-mark">P</div>
     <div class="header-text">
-      <h1>Perific – Timrapport <button class="version-btn" onclick="openChangelog()" title="Versionshistorik">v1.8.0</button></h1>
+      <h1>Perific – Timrapport <button class="version-btn" onclick="openChangelog()" title="Versionshistorik">v1.9.0</button></h1>
       <p>Veckovis tidsrapportering / Developer time log</p>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px">
@@ -310,9 +310,20 @@
 
     <div class="cl-version">
       <div class="cl-version-header">
-        <span class="cl-version-num current">v1.8.0</span>
-        <span class="cl-version-date current">2026-04-29</span>
+        <span class="cl-version-num current">v1.9.0</span>
+        <span class="cl-version-date current">2026-04-30</span>
         <span class="cl-current-badge">CURRENT</span>
+      </div>
+      <ul class="cl-items">
+        <li>Hjälpsektionen uppdaterad: Support och Maintenance separata, Support Duty tillagt, nytt kombinationsexempel</li>
+      </ul>
+    </div>
+    <hr class="cl-divider">
+
+    <div class="cl-version">
+      <div class="cl-version-header">
+        <span class="cl-version-num">v1.8.0</span>
+        <span class="cl-version-date">2026-04-29</span>
       </div>
       <ul class="cl-items">
         <li>Korrekt Perific-ikon som favicon (hämtad från perific.com)</li>
@@ -451,7 +462,9 @@
     <h3>Kategorier</h3>
     <ul>
       <li><strong>Nyutveckling</strong> — ny kod, nya features</li>
-      <li><strong>Support / Maint.</strong> — buggar, driftsättning, teknisk skuld</li>
+      <li><strong>Support</strong> — buggar, kundärenden, akut felsökning</li>
+      <li><strong>Maintenance</strong> — driftsättning, teknisk skuld, underhåll</li>
+      <li><strong>Support Duty</strong> — vecka med schemalagd supportjour</li>
       <li><strong>SW / Backend för HW</strong> — SW-arbete kopplat till hårdvaruprodukter</li>
       <li><strong>Möten / Övrigt</strong> — möten, planering, dokumentation</li>
       <li><strong>Ledighet</strong> — väljs automatiskt vid Ledigt / Sjuk / VAB</li>
@@ -463,7 +476,7 @@
       <thead><tr><th>Projekt</th><th>Kategori</th><th>Andel</th></tr></thead>
       <tbody>
         <tr><td>Thor Charger</td><td>SW / Backend för HW</td><td>40%</td></tr>
-        <tr><td>Floor</td><td>Nyutveckling</td><td>30%</td></tr>
+        <tr><td>Support Duty</td><td>Support</td><td>30%</td></tr>
         <tr><td>Möte</td><td>Möten / Övrigt</td><td>20%</td></tr>
         <tr><td>Sjuk</td><td>Ledighet</td><td>10%</td></tr>
       </tbody>
@@ -473,6 +486,7 @@
     <ul>
       <li>Fixat OTA för Thor? → <strong>Thor Charger</strong> + <strong>SW / Backend för HW</strong></li>
       <li>Byggt API för Floor? → <strong>Floor</strong> + <strong>SW / Backend för HW</strong></li>
+      <li>Haft Support Duty? → <strong>Support Duty</strong> + <strong>Support</strong> eller <strong>Maintenance</strong></li>
       <li>Ledigt halva veckan? → t.ex. <strong>Sjuk 50%</strong> + <strong>Shield 50%</strong></li>
       <li>Mycket möten? → <strong>Möte</strong> + <strong>Möten / Övrigt</strong> för den andelen</li>
     </ul>
