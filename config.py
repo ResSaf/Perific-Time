@@ -17,14 +17,6 @@ if _reporters_json:
 else:
     # Hårdkodad fallback — uppdatera med riktiga Slack User IDs
     REPORTERS: list[dict] = [
-        {"name": "Tomas Ö",    "slack_id": "U0A5QA2BZ"},
-        {"name": "Anders B",     "slack_id": "U3WBSPKPW"},
-        {"name": "Muzaffer A",     "slack_id": "U06TB02GY4U"},
-        {"name": "Guillaume L",    "slack_id": "U04UJ5CGRQQ"},
-        {"name": "Jonny S",     "slack_id": "U04M056CF29"},
-        {"name": "Dennis L",     "slack_id": "U0450PC2Y9H"},
-        {"name": "Simon G",    "slack_id": "U03G4KL4K8X"},
-        {"name": "Oskar Ö",    "slack_id": "U02R46W57PA"},
-        {"name": "Erik Å",    "slack_id": "U03G4KL9QDD"},
+        {""},
         # Lägg till övriga 5 här ...
     ]
